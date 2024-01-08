@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <script src="server.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+        }
+
+        .weather-container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.5s;
+        }
+
+        .search {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .search input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-right: 8px;
+            border: 1px solid #000;
+        }
+
+        .search button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search button:hover {
+            background-color: #2980b9;
+        }
+
+        .weather-info {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.7);
+            margin-top: 20px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .weather-container.show .weather-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fadeIn {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        /* Background colors */
+        .warm {
+            background-color: #f39c12;
+        }
+
+        .moderate {
+            background-color: #27ae60;
+        }
+
+        .cool {
+            background-color: #3498db;
+        }
+
+        .cold {
+            background-color: #34495e;
+        }
+
+        .btn {
+ padding: 1.1em 2em;
+ background: none;
+ border: 2px solid #fff;
+ font-size: 15px;
+ color: #131313;
+ cursor: pointer;
+ position: relative;
+ overflow: hidden;
+ transition: all 0.3s;
+ border-radius: 12px;
+ background-color: #ecd448;
+ font-weight: bolder;
+ box-shadow: 0 2px 0 2px #000;
+}
+
+.btn:before {
+ content: "";
+ position: absolute;
+ width: 100px;
+ height: 120%;
+ background-color: #ff6700;
+ top: 50%;
+ transform: skewX(30deg) translate(-150%, -50%);
+ transition: all 0.5s;
+}
+
+.btn:hover {
+ background-color: #4cc9f0;
+ color: #fff;
+ box-shadow: 0 2px 0 2px #0d3b66;
+}
+
+.btn:hover::before {
+ transform: skewX(30deg) translate(210%, -50%);
+ transition-delay: 0.1s;
+}
+
+.btn:active {
+ transform: scale(0.9);
+}
+    </style>
+</head>
+<body>
+    <div class="weather-container">
+        <h1 class="fadeIn">Weather App</h1>
+        <div class="search">
+            <input type="text" id="cityInput" placeholder="Enter city name">
+            <button onclick="getWeather()" class="fadeIn">Get Weather</button>
+        </div>
+        <div class="weather-info">
+            <h2 id="cityName"></h2>
+            <p id="temperature"></p>
+            <p id="description"></p>
+        </div>
+        <!-- <div>
+            <a href="https://weather.com/en-IN/weather/today/l/16.85,81.53?par=google">
+                <button class="btn"> Current Location Weather
+                </button>
+            </a>
+        </div> -->
+    </div>
+    <script>
+        const apiKey = "d7563d16bf80bd8068b568c53d65f430";
+        
+        const cityInput = document.getElementById('cityInput');
+        const cityNameElement = document.getElementById('cityName');
+        const temperatureElement = document.getElementById('temperature');
+        const descriptionElement = document.getElementById('description');
+        const body = document.body;
+
+        function getWeather() {
+            const city = cityInput.value.trim();
+            if (!city) {
+                alert('Please enter a city name.');
+                return;
+            }
+
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const temperature = data.main.temp;
+                    cityNameElement.textContent = data.name;
+                    temperatureElement.textContent = `Temperature: ${temperature} °C`;
+                    descriptionElement.textContent = `Weather: ${data.weather[0].description}`;
+                    document.querySelector('.weather-container').classList.add('show');
+
+                    // Update background color based on temperature
+                    if (temperature > 33) {
+                        body.classList = 'warm';
+                    } else if (temperature > 33) {
+                        body.classList = 'moderate';
+                    } else if (temperature > 25) {
+                        body.classList = 'cool';
+                    } else {
+                        body.classList = 'cold';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching weather data:', error);
+                    alert('Error fetching weather data. Please try again later.');
+                });
+        }
+    </script>
+</body>
+</html>
